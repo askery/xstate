@@ -145,23 +145,18 @@ for gnb in classifiers:
             # this takes the elements from Xtrain and ytrain for previous list n
             Xtrainprime = [Xtrain[i] for i in n]
             ytrainprime = [ytrain[i] for i in n]
-
-            train_data      = Xtrainprime
-            train_target    = ytrainprime
-            test_data       = Xtest
-            test_target     = ytest
             
             # Train the classifier
-            model = gnb.fit(train_data, train_target)  
+            model = gnb.fit(Xtrainprime, ytrainprime)  
             
             # Make predictions
-            preds = gnb.predict(test_data)
+            preds = gnb.predict(Xtest)
             #print(len(preds))
             
             # from sklearn.metrics import accuracy_score    
             # Evaluate accuracy
             #print(j,accuracy_score(test_target, preds))
-            meanacc.append(accuracy_score(test_target, preds))
+            meanacc.append(accuracy_score(ytest, preds))
     
     #Evaluate mean accuracy
     #print(meanacc)
