@@ -18,13 +18,14 @@ print('program running...')
 import numpy as np
 import pandas as pd
 import random
+import matplotlib.pyplot as plt
 from sklearn import svm
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+#
 #import csv
 #from sklearn.naive_bayes import GaussianNB,BernoulliNB,MultinomialNB
 #from matplotlib.colors import ListedColormap
@@ -110,6 +111,35 @@ np.savetxt('ydata.txt', ydata, delimiter = '    ')
 #\end{creation of raw data}
 # --------------------------------------------------------------------------
 
+
+# --------------------------------------------------------------------------
+"""
+This part makes the data equally distributated in terms of the binary 
+classification, i.e., equal number of entangled and separable instances.
+Comment all if you do not care! But if you pick a number (0 or 1) you will get 50%
+error score if sets are equally distributed. If not, say, if you have 80% of 
+nonentangled instances, you may get a score of 80% just by always saying "0"  
+"""
+allind = list(range(len(Xdata)))
+entind = [i for i, j in enumerate(ydata) if j == 1 ]
+
+def returnNotMatches(a, b):
+    a = set(a)
+    b = set(b)
+    return list(a - b)
+
+nenind = returnNotMatches(allind,entind)
+
+n = random.sample(nenind, len(entind))
+
+eqdind = entind + n
+random.shuffle(eqdind)
+
+Xdata = [Xdata[i] for i in eqdind]
+ydata = [ydata[i] for i in eqdind]
+# --------------------------------------------------------------------------
+
+
 # \begin{split data in Train and Test}
 #
 Xtrain, Xtest, ytrain, ytest = train_test_split(Xdata, ydata, test_size=0.33, random_state=42)
@@ -132,7 +162,7 @@ print('------------------------------------')
 ind = list(range(len(Xtrain)))
 
 # number of avarages
-nmed = 1    
+nmed = 5    
 for gnb in classifiers:
     # this is for visual progress of the execution
     print('------------------------------------')
@@ -141,7 +171,7 @@ for gnb in classifiers:
       
     meanacc     = []
     accvssize   = []
-    for ntrset in range(10,51):
+    for ntrset in range(10,501):
         # training set generation
         for j in range(nmed):
             # this picks n indices from Xtrain - it is a list!
