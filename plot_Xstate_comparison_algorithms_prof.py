@@ -17,18 +17,18 @@ print('program running...')
 #packages
 import numpy as np
 import pandas as pd
-import csv
 import random
+from sklearn import svm
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
+#import csv
 #from sklearn.naive_bayes import GaussianNB,BernoulliNB,MultinomialNB
 #from matplotlib.colors import ListedColormap
 #from sklearn.neighbors import KNeighborsClassifier
-#from sklearn import svm
 #from sklearn.gaussian_process import GaussianProcessClassifier
 #from sklearn.gaussian_process.kernels import RBF
 #from sklearn.preprocessing import StandardScaler
@@ -38,8 +38,8 @@ from sklearn.metrics import accuracy_score
 # names of the methods we gonna test (for plotting usage)
 names = [
         "MLP",
-        #"RBF SVC",
-        #"Linear SVC",
+        "Linear SVC",
+        "RBF SVC",
         "AdaBoost",
         # "Naive Bayes", 
          #"BernoulliNB",
@@ -50,8 +50,8 @@ names = [
 # definition of the methods in [names] (for computational usage)
 classifiers = [
     MLPClassifier(solver='lbfgs', alpha=1e-5),
-    #svm.SVC(),    
-    #SVC(kernel="linear", C=0.025),
+    svm.SVC(),    
+    svm.SVC(kernel="linear", C=0.025),
     AdaBoostClassifier(),
     #GaussianNB(),
     #BernoulliNB(),
@@ -103,16 +103,23 @@ Xdata = list (df_Xdata.values)
 ydata = list ( map(lambda x: 0 if x >= 0 else 1, max_x_y - minG_H ) )
 #ydata = list ( map(lambda x: 1 if x >= 0 else 0, max_x_y - minG_H ) )
 
-# comment if not to save to file
+# comment if not to save to file - they are splitted below
 np.savetxt('Xdata.txt', Xdata, delimiter = '    ')
 np.savetxt('ydata.txt', ydata, delimiter = '    ')
-
-
+#
 #\end{creation of raw data}
 # --------------------------------------------------------------------------
 
 # \begin{split data in Train and Test}
+#
 Xtrain, Xtest, ytrain, ytest = train_test_split(Xdata, ydata, test_size=0.33, random_state=42)
+
+# comment if not to save to file
+np.savetxt('Xtrain.txt', Xtrain, delimiter = '    ')
+np.savetxt('ytrain.txt', ytrain, delimiter = '    ')
+np.savetxt('Xtest.txt', Xtest, delimiter = '    ')
+np.savetxt('ytest.txt', ytest, delimiter = '    ')
+#
 # \end{split}
 
 print('------------------------------------')
@@ -125,17 +132,16 @@ print('------------------------------------')
 ind = list(range(len(Xtrain)))
 
 # number of avarages
-nmed = 5    
+nmed = 1    
 for gnb in classifiers:
+    # this is for visual progress of the execution
     print('------------------------------------')
     print(gnb)
     print('------------------------------------')
-    
-   
-    
+      
     meanacc     = []
     accvssize   = []
-    for ntrset in range(1,51):
+    for ntrset in range(10,51):
         # training set generation
         for j in range(nmed):
             # this picks n indices from Xtrain - it is a list!
