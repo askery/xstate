@@ -65,43 +65,46 @@ classifiers = [
 # --------------------------------------------------------------------------
 # \begin{creation of the data - Xdata and ydata
 #
-datasize    = 40000
-colnames    = ['theta','phi','psi','x','y','u','v']  #col names for pandas
-raw         = np.random.random(size = [datasize,7])
-df_raw      = pd.DataFrame(raw, columns = colnames)
-#print(df_raw)
-df_raw['theta'] = df_raw['theta']*(np.pi/2)
-df_raw['phi'] = df_raw['phi']*(np.pi/2)
-df_raw['psi'] = df_raw['psi']*(np.pi/2)
-df_raw['x'] = df_raw['x']
-df_raw['y'] = df_raw['y']
-df_raw['u'] = df_raw['u']*(2*np.pi)
-df_raw['v'] = df_raw['v']*(2*np.pi)
-#print(df_raw)
-#
-df_G = np.sin(df_raw['theta'])**4 * np.cos(df_raw['phi'])**2 * \
-        np.sin( df_raw['phi'] )**2 * np.cos(df_raw['psi'])**2
-#
-#df_B = np.sin(df_raw['theta'])**2 * ( 1 -  np.sin(df_raw['phi'])**2 * np.sin( df_raw['psi'] )**2 )        
-#  
-df_H = np.sin(df_raw['theta'])**2 * np.cos(df_raw['theta'])**2 * \
-        np.sin( df_raw['phi'] )**2 * np.sin(df_raw['psi'])**2
+Xdata       = []
+ydata       = []
+size        = 100
+while (sum(ydata) < size):
+    colnames    = ['theta','phi','psi','x','y','u','v']  #col names for pandas
+    raw         = np.random.random(size = [1,7])
+    df_raw      = pd.DataFrame(raw, columns = colnames)
+    #print(df_raw)
+    df_raw['theta'] = df_raw['theta']*(np.pi/2)
+    df_raw['phi'] = df_raw['phi']*(np.pi/2)
+    df_raw['psi'] = df_raw['psi']*(np.pi/2)
+    df_raw['x'] = df_raw['x']
+    df_raw['y'] = df_raw['y']
+    df_raw['u'] = df_raw['u']*(2*np.pi)
+    df_raw['v'] = df_raw['v']*(2*np.pi)
+    #print(df_raw)
+    #
+    df_G = np.sin(df_raw['theta'])**4 * np.cos(df_raw['phi'])**2 * \
+            np.sin( df_raw['phi'] )**2 * np.cos(df_raw['psi'])**2
+    #
+    #df_B = np.sin(df_raw['theta'])**2 * ( 1 -  np.sin(df_raw['phi'])**2 * np.sin( df_raw['psi'] )**2 )        
+    #  
+    df_H = np.sin(df_raw['theta'])**2 * np.cos(df_raw['theta'])**2 * \
+            np.sin( df_raw['phi'] )**2 * np.sin(df_raw['psi'])**2
 
-#
-df_raw['x'] = df_raw['x']*df_H
-df_raw['y'] = df_raw['y']*df_G
- 
-#
-x = np.array (df_raw['x'])
-y = np.array (df_raw['y'])
-G = np.array(df_G)
-H = np.array(df_H)
-max_x_y = np.maximum(x,y)
-minG_H =  np.minimum(G,H)
-#     
-df_Xdata= df_raw
-Xdata = list (df_Xdata.values)
-ydata = list ( map(lambda x: 0 if x >= 0 else 1, max_x_y - minG_H ) )
+    #
+    df_raw['x'] = df_raw['x']*df_H
+    df_raw['y'] = df_raw['y']*df_G
+
+    #
+    x = np.array (df_raw['x'])
+    y = np.array (df_raw['y'])
+    G = np.array(df_G)
+    H = np.array(df_H)
+    max_x_y = np.maximum(x,y)
+    minG_H =  np.minimum(G,H)
+    #     
+    df_Xdata= df_raw
+    Xdata. extend (df_Xdata.values )
+    ydata. extend (  list (map(lambda x: 0 if x >= 0 else 1, max_x_y - minG_H ) ) )
 #ydata = list ( map(lambda x: 1 if x >= 0 else 0, max_x_y - minG_H ) )
 
 # comment if not to save to file - they are splitted below
