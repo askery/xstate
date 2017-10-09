@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Sep  9 09:04:29 2017
-
 @author: Askery Canabarrro
+
+Comparison of sklearn classification algorithms for 2 qubits Xstate
 """
 print(__doc__)
 #from ___future__ import division
@@ -20,32 +20,21 @@ import pandas as pd
 import random
 import matplotlib.pyplot as plt
 from sklearn import svm
+from sklearn.svm import NuSVC
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 #
-#import csv
-#from sklearn.naive_bayes import GaussianNB,BernoulliNB,MultinomialNB
-#from matplotlib.colors import ListedColormap
-#from sklearn.neighbors import KNeighborsClassifier
-#from sklearn.gaussian_process import GaussianProcessClassifier
-#from sklearn.gaussian_process.kernels import RBF
-#from sklearn.preprocessing import StandardScaler
-#from sklearn.datasets import make_moons, make_circles, make_classification
-#from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 
 # names of the methods we gonna test (for plotting usage)
 names = [
         "MLP",
         "Linear SVC",
         "RBF SVC",
+        "NuSVC",
         "AdaBoost",
-        # "Naive Bayes", 
-         #"BernoulliNB",
-         #"MultinomialNB",
-         "Decision Tree",
          "RandomForestClassifier"
          ]
 # definition of the methods in [names] (for computational usage)
@@ -53,10 +42,8 @@ classifiers = [
     MLPClassifier(solver='lbfgs', alpha=1e-5),
     svm.SVC(),    
     svm.SVC(kernel="linear", C=0.025),
+    NuSVC(),
     AdaBoostClassifier(),
-    #GaussianNB(),
-    #BernoulliNB(),
-    #MultinomialNB(),
     DecisionTreeClassifier(max_depth=5),
     RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
     ]
@@ -67,7 +54,7 @@ classifiers = [
 #
 Xdata       = []
 ydata       = []
-size        = 100
+size        = 300
 while (sum(ydata) < size):
     colnames    = ['theta','phi','psi','x','y','u','v']  #col names for pandas
     raw         = np.random.random(size = [1,7])
@@ -105,7 +92,6 @@ while (sum(ydata) < size):
     df_Xdata= df_raw
     Xdata. extend (df_Xdata.values )
     ydata. extend (  list (map(lambda x: 0 if x >= 0 else 1, max_x_y - minG_H ) ) )
-#ydata = list ( map(lambda x: 1 if x >= 0 else 0, max_x_y - minG_H ) )
 
 # comment if not to save to file - they are splitted below
 np.savetxt('Xdata.txt', Xdata, delimiter = '    ')
@@ -118,7 +104,7 @@ np.savetxt('ydata.txt', ydata, delimiter = '    ')
 # --------------------------------------------------------------------------
 """
 This part makes the data equally distributated in terms of the binary 
-classification, i.e., equal number of entangled and separable instances.
+classification, i.e., equal number of entangled and separable states.
 Comment all if you do not care! But if you pick a number (0 or 1) you will get 50%
 error score if sets are equally distributed. If not, say, if you have 80% of 
 nonentangled instances, you may get a score of 80% just by always saying "0"  
@@ -164,8 +150,8 @@ print('------------------------------------')
 # list of indices of Xtrain
 ind = list(range(len(Xtrain)))
 
-# number of avarages
-nmed = 3    
+# number of avarages 
+nmed = 5    
 for gnb in classifiers:
     ti = datetime.now()
     # this is for visual progress of the execution
@@ -175,7 +161,9 @@ for gnb in classifiers:
       
     meanacc     = []
     accvssize   = []
-    for ntrset in range(10,len(Xtrain)):
+    # some SVM algorithms have bad or impossible performance for small training set
+    # so we start around 20
+    for ntrset in range(100,len(Xtrain)):
         # training set generation
         for j in range(nmed):
             # this picks n indices from Xtrain - it is a list!
@@ -193,15 +181,10 @@ for gnb in classifiers:
             preds = gnb.predict(Xtest)
             #print(len(preds))
             
-            # from sklearn.metrics import accuracy_score    
             # Evaluate accuracy
-            #print(j,accuracy_score(test_target, preds))
             meanacc.append(accuracy_score(ytest, preds))
     
-    #Evaluate mean accuracy
-    #print(meanacc)
-    
-        #print(ntrset,sum(meanacc)/len(meanacc))
+        #Evaluate mean accuracy
         accvssize.append([ntrset,sum(meanacc)/len(meanacc)])
         
         #
@@ -210,17 +193,14 @@ for gnb in classifiers:
     
         if ntrset % 50 == 0:
             print('step ',ntrset)
-            
-#    with open("output.csv", "w+") as out:
-#            writer = csv.writer(out)
-#            writer.writerows(accvssize)
-          
+                      
     out = pd.DataFrame(np.array(accvssize), columns = ['c1','c2'])
-    #print(out)
     
     xx = out['c1']
     yy = out['c2']
     plt.plot(xx,yy)
+    
+    # print job duration for each classifier
     print ('duration: ', datetime.now() - ti)
 
 plt.xlabel('Training Set Size')
