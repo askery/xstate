@@ -65,7 +65,7 @@ classifiers = [
 # --------------------------------------------------------------------------
 # \begin{creation of the data - Xdata and ydata
 #
-datasize    = 3000
+datasize    = 40000
 colnames    = ['theta','phi','psi','x','y','u','v']  #col names for pandas
 raw         = np.random.random(size = [datasize,7])
 df_raw      = pd.DataFrame(raw, columns = colnames)
@@ -162,8 +162,9 @@ print('------------------------------------')
 ind = list(range(len(Xtrain)))
 
 # number of avarages
-nmed = 5    
+nmed = 3    
 for gnb in classifiers:
+    ti = datetime.now()
     # this is for visual progress of the execution
     print('------------------------------------')
     print(gnb)
@@ -171,7 +172,7 @@ for gnb in classifiers:
       
     meanacc     = []
     accvssize   = []
-    for ntrset in range(10,501):
+    for ntrset in range(10,len(Xtrain)):
         # training set generation
         for j in range(nmed):
             # this picks n indices from Xtrain - it is a list!
@@ -217,6 +218,7 @@ for gnb in classifiers:
     xx = out['c1']
     yy = out['c2']
     plt.plot(xx,yy)
+    print ('duration: ', datetime.now() - ti)
 
 plt.xlabel('Training Set Size')
 plt.ylabel('Output Layer Accuracy')
