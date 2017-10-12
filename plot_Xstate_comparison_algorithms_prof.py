@@ -56,7 +56,7 @@ classifiers = [
 #
 Xdata       = []
 ydata       = []
-size        = 1000
+size        = 10000
 while (sum(ydata) < size):
     colnames    = ['theta','phi','psi','x','y','u','v']  #col names for pandas
     raw         = np.random.random(size = [1,7])
@@ -95,10 +95,6 @@ while (sum(ydata) < size):
     Xdata. extend (df_Xdata.values )
     ydata. extend (  list (map(lambda x: 0 if x >= 0 else 1, max_x_y - minG_H ) ) )
 
-# comment if not to save to file - they are splitted below
-np.savetxt('Xdata.txt', Xdata, delimiter = '    ')
-np.savetxt('ydata.txt', ydata, delimiter = '    ')
-#
 #\end{creation of raw data}
 # --------------------------------------------------------------------------
 
@@ -128,6 +124,11 @@ random.shuffle(eqdind)
 
 Xdata = [Xdata[i] for i in eqdind]
 ydata = [ydata[i] for i in eqdind]
+
+# comment if not to save to file - they are splitted below
+np.savetxt('Xdata.txt', Xdata, delimiter = '    ')
+np.savetxt('ydata.txt', ydata, delimiter = '    ')
+#
 # --------------------------------------------------------------------------
 
 
@@ -146,6 +147,8 @@ np.savetxt('ytest.txt', ytest, delimiter = '    ')
 print('------------------------------------')
 print('Train and test sets generated     :D')
 print('------------------------------------')
+print('elapsed time to create data: ', datetime.now() - start )
+print('------------------------------------')
 print('proceeding to ML part             :D')
 print('------------------------------------')
 
@@ -153,7 +156,9 @@ print('------------------------------------')
 ind = list(range(len(Xtrain)))
 
 # number of avarages 
-nmed = 1    
+nmed = 1
+min_trsize = 50
+trset_inc  = 50  
 for gnb,name in zip(classifiers,names):
     ti = datetime.now()
     # this is for visual progress of the execution
@@ -165,7 +170,7 @@ for gnb,name in zip(classifiers,names):
     accvssize   = []
     # some SVM algorithms have bad or impossible performance for small training set
     # so we start around 20
-    for ntrset in range(50,202,50):
+    for ntrset in range(min_trsize,len(Xtrain),trset_inc):
         # training set generation
         for j in range(nmed):
             # this picks n indices from Xtrain - it is a list!
