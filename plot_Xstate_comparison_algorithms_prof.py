@@ -58,43 +58,34 @@ Xdata       = []
 ydata       = []
 size        = 10000
 while (sum(ydata) < size):
-    colnames    = ['theta','phi','psi','x','y','u','v']  #col names for pandas
-    raw         = np.random.random(size = [1,7])
-    df_raw      = pd.DataFrame(raw, columns = colnames)
-    #print(df_raw)
-    df_raw['theta'] = df_raw['theta']*(np.pi/2)
-    df_raw['phi'] = df_raw['phi']*(np.pi/2)
-    df_raw['psi'] = df_raw['psi']*(np.pi/2)
-    df_raw['x'] = df_raw['x']
-    df_raw['y'] = df_raw['y']
-    df_raw['u'] = df_raw['u']*(2*np.pi)
-    df_raw['v'] = df_raw['v']*(2*np.pi)
-    #print(df_raw)
+    #colnames    = ['theta','phi','psi','x','y','u','v']  #col names for pandas
+    theta = np.random.random()*(np.pi/2)
+    phi = np.random.random()*(np.pi/2)
+    psi = np.random.random()*(np.pi/2)
+    x = np.random.random()
+    y = np.random.random()
+    u = np.random.random()*(2*np.pi)
+    v        = np.random.random()*(2*np.pi)
     #
-    df_G = np.sin(df_raw['theta'])**4 * np.cos(df_raw['phi'])**2 * \
-            np.sin( df_raw['phi'] )**2 * np.cos(df_raw['psi'])**2
+    G = np.sin(theta)**4 * np.cos(phi)**2 * np.sin( phi )**2 * np.cos(psi)**2
     #
     #df_B = np.sin(df_raw['theta'])**2 * ( 1 -  np.sin(df_raw['phi'])**2 * np.sin( df_raw['psi'] )**2 )        
     #  
-    df_H = np.sin(df_raw['theta'])**2 * np.cos(df_raw['theta'])**2 * \
-            np.sin( df_raw['phi'] )**2 * np.sin(df_raw['psi'])**2
+    H = np.sin(theta)**2 * np.cos(theta)**2 *np.sin( phi )**2 * np.sin( psi )**2
 
     #
-    df_raw['x'] = df_raw['x']*df_H
-    df_raw['y'] = df_raw['y']*df_G
-
+    x = x*H
+    y = y*G
     #
-    x = np.array (df_raw['x'])
-    y = np.array (df_raw['y'])
-    G = np.array(df_G)
-    H = np.array(df_H)
+    Xdata. extend ( [np.array([theta,phi,psi,x,y,u,v])] )
+
     max_x_y = np.maximum(x,y)
     minG_H =  np.minimum(G,H)
-    #     
-    df_Xdata= df_raw
-    Xdata. extend (df_Xdata.values )
-    ydata. extend (  list (map(lambda x: 0 if x >= 0 else 1, max_x_y - minG_H ) ) )
-
+    
+    if ( max_x_y - minG_H ) >= 0:
+        ydata. append (0)
+    else:
+        ydata. append (1)
 #\end{creation of raw data}
 # --------------------------------------------------------------------------
 
@@ -158,7 +149,7 @@ ind = list(range(len(Xtrain)))
 # number of avarages 
 nmed = 1
 min_trsize = 50
-trset_inc  = 50  
+trset_inc  = 100  
 for gnb,name in zip(classifiers,names):
     ti = datetime.now()
     # this is for visual progress of the execution
