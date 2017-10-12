@@ -19,6 +19,7 @@ import numpy as np
 import pandas as pd
 import random
 import matplotlib.pyplot as plt
+import os
 from sklearn import svm
 from sklearn.svm import NuSVC
 from sklearn.neural_network import MLPClassifier
@@ -35,6 +36,7 @@ names = [
         "RBF SVC",
         "NuSVC",
         "AdaBoost",
+        "DecisionTree",
          "RandomForestClassifier"
          ]
 # definition of the methods in [names] (for computational usage)
@@ -54,7 +56,7 @@ classifiers = [
 #
 Xdata       = []
 ydata       = []
-size        = 300
+size        = 1000
 while (sum(ydata) < size):
     colnames    = ['theta','phi','psi','x','y','u','v']  #col names for pandas
     raw         = np.random.random(size = [1,7])
@@ -151,8 +153,8 @@ print('------------------------------------')
 ind = list(range(len(Xtrain)))
 
 # number of avarages 
-nmed = 5    
-for gnb in classifiers:
+nmed = 1    
+for gnb,name in zip(classifiers,names):
     ti = datetime.now()
     # this is for visual progress of the execution
     print('------------------------------------')
@@ -163,7 +165,7 @@ for gnb in classifiers:
     accvssize   = []
     # some SVM algorithms have bad or impossible performance for small training set
     # so we start around 20
-    for ntrset in range(100,len(Xtrain)):
+    for ntrset in range(50,202,50):
         # training set generation
         for j in range(nmed):
             # this picks n indices from Xtrain - it is a list!
@@ -202,6 +204,14 @@ for gnb in classifiers:
     
     # print job duration for each classifier
     print ('duration: ', datetime.now() - ti)
+    folder  =  name 
+    #folder  = "/out/"+str(name) 
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    path = str(folder) + "/" + name + ".txt"    
+    np.savetxt(path, accvssize, delimiter = '    ')
+
+    #print (yy)
 
 plt.xlabel('Training Set Size')
 plt.ylabel('Output Layer Accuracy')
